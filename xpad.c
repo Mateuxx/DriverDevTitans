@@ -363,50 +363,6 @@ static const u8 xboxone_rumblebegin_init[] = {
 	0x00, GIP_MOTOR_ALL, 0x00, 0x00, 0x1D, 0x1D, 0xFF, 0x00, 0x00
 };
 
-/*
- * A rumble packet with zero FF intensity will immediately
- * terminate the rumbling required to init PowerA pads.
- * This should happen fast enough that the motors don't
- * spin up to enough speed to actually vibrate the gamepad.
- */
-// static const u8 xboxone_rumbleend_init[] = {
-// 	GIP_CMD_RUMBLE, 0x00, GIP_SEQ0, GIP_PL_LEN(9),
-// 	0x00, GIP_MOTOR_ALL, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-// };
-
-// /* GHL Xbox One magic data */
-// static const char ghl_xboxone_magic_data[] = {
-// 	0x22, 0x00, 0x00, 0x08, 0x02, 0x08, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00
-// };
-
-/*
- * This specifies the selection of init packets that a gamepad
- * will be sent on init *and* the order in which they will be
- * sent. The correct sequence number will be added when the
- * packet is going to be sent.
- */
-// xboxone_init_packets is not used
-
-// static const struct xboxone_init_packet xboxone_init_packets[] = {
-// 	XBOXONE_INIT_PKT(0x0e6f, 0x0165, xboxone_hori_ack_id),
-// 	XBOXONE_INIT_PKT(0x0f0d, 0x0067, xboxone_hori_ack_id),
-// 	XBOXONE_INIT_PKT(0x1430, 0x079b, xboxone_hori_ack_id),
-// 	XBOXONE_INIT_PKT(0x0000, 0x0000, xboxone_power_on),
-// 	XBOXONE_INIT_PKT(0x045e, 0x02ea, xboxone_s_init),
-// 	XBOXONE_INIT_PKT(0x045e, 0x0b00, xboxone_s_init),
-// 	XBOXONE_INIT_PKT(0x045e, 0x0b00, extra_input_packet_init),
-// 	XBOXONE_INIT_PKT(0x0e6f, 0x0000, xboxone_pdp_led_on),
-// 	XBOXONE_INIT_PKT(0x1430, 0x079b, xboxone_pdp_led_on),
-// 	XBOXONE_INIT_PKT(0x0e6f, 0x0000, xboxone_pdp_auth),
-// 	XBOXONE_INIT_PKT(0x1430, 0x079b, xboxone_pdp_auth),
-// 	XBOXONE_INIT_PKT(0x24c6, 0x541a, xboxone_rumblebegin_init),
-// 	XBOXONE_INIT_PKT(0x24c6, 0x542a, xboxone_rumblebegin_init),
-// 	XBOXONE_INIT_PKT(0x24c6, 0x543a, xboxone_rumblebegin_init),
-// 	XBOXONE_INIT_PKT(0x24c6, 0x541a, xboxone_rumbleend_init),
-// 	XBOXONE_INIT_PKT(0x24c6, 0x542a, xboxone_rumbleend_init),
-// 	XBOXONE_INIT_PKT(0x24c6, 0x543a, xboxone_rumbleend_init),
-// };
-
 struct xpad_output_packet {
 	u8 data[XPAD_PKT_LEN];
 	u8 len;
@@ -466,8 +422,6 @@ struct usb_xpad {
 
 static int xpad_init_input(struct usb_xpad *xpad);
 static void xpad_deinit_input(struct usb_xpad *xpad);
-
-
 
 /*
  *	xpad_process_packet
@@ -632,7 +586,6 @@ static void xpad_presence_work(struct work_struct *work)
 		xpad_deinit_input(xpad);
 	}
 }
-
 
 static void xpad_irq_in(struct urb *urb)
 {
@@ -1145,61 +1098,6 @@ static void xpad_stop_input(struct usb_xpad *xpad)
 	usb_kill_urb(xpad->irq_in);
 }
 
-// static void xpad360w_poweroff_controller(struct usb_xpad *xpad)
-// {
-// 	unsigned long flags;
-// 	struct xpad_output_packet *packet =
-// 			&xpad->out_packets[XPAD_OUT_CMD_IDX];
-
-// 	spin_lock_irqsave(&xpad->odata_lock, flags);
-
-// 	packet->data[0] = 0x00;
-// 	packet->data[1] = 0x00;
-// 	packet->data[2] = 0x08;
-// 	packet->data[3] = 0xC0;
-// 	packet->data[4] = 0x00;
-// 	packet->data[5] = 0x00;
-// 	packet->data[6] = 0x00;
-// 	packet->data[7] = 0x00;
-// 	packet->data[8] = 0x00;
-// 	packet->data[9] = 0x00;
-// 	packet->data[10] = 0x00;
-// 	packet->data[11] = 0x00;
-// 	packet->len = 12;
-// 	packet->pending = true;
-
-// 	/* Reset the sequence so we send out poweroff now */
-// 	xpad->last_out_packet = -1;
-// 	xpad_try_sending_next_out_packet(xpad);
-
-// 	spin_unlock_irqrestore(&xpad->odata_lock, flags);
-// }
-
-static int xpad360w_start_input(struct usb_xpad *xpad)
-{
-	int error;
-
-	error = usb_submit_urb(xpad->irq_in, GFP_KERNEL);
-	if (error)
-		return -EIO;
-
-	/*
-	 * Send presence packet.
-	 * This will force the controller to resend connection packets.
-	 * This is useful in the case we activate the module after the
-	 * adapter has been plugged in, as it won't automatically
-	 * send us info about the controllers.
-	 */
-	error = xpad_inquiry_pad_presence(xpad);
-	if (error) {
-		usb_kill_urb(xpad->irq_in);
-		return error;
-	}
-
-	return 0;
-}
-
-
 static int xpad_open(struct input_dev *dev)
 {
 	struct usb_xpad *xpad = input_get_drvdata(dev);
@@ -1221,11 +1119,7 @@ static void xpad_set_up_abs(struct input_dev *input_dev, signed short abs)
 	switch (abs) {
 	case ABS_X:
 	case ABS_Y:
-		/* GHL Strum bar */
-		if ((xpad->xtype == XTYPE_XBOXONE) && (xpad->quirks & QUIRK_GHL_XBOXONE)) {
-			input_set_abs_params(input_dev, abs, -32767, 32767, 0, 0);
-			break;
-		}
+		break;
 	case ABS_RX:
 	case ABS_RY:	/* the two sticks */
 		input_set_abs_params(input_dev, abs, -32768, 32767, 16, 128);
@@ -1274,11 +1168,6 @@ static int xpad_init_input(struct usb_xpad *xpad)
 
 	input_set_drvdata(input_dev, xpad);
 
-	if (xpad->xtype != XTYPE_XBOX360W) {
-		input_dev->open = xpad_open;
-		input_dev->close = xpad_close;
-	}
-
 	if (!(xpad->mapping & MAP_STICKS_TO_NULL)) {
 		/* set up axes */
 		for (i = 0; xpad_abs[i] >= 0; i++)
@@ -1312,18 +1201,7 @@ static int xpad_init_input(struct usb_xpad *xpad)
 			input_set_capability(input_dev, EV_KEY, xpad_btn_paddles[i]);
 	}
 
-	/*
-	 * This should be a simple else block. However historically
-	 * xbox360w has mapped DPAD to buttons while xbox360 did not. This
-	 * made no sense, but now we can not just switch back and have to
-	 * support both behaviors.
-	 */
-	if (!(xpad->mapping & MAP_DPAD_TO_BUTTONS) ||
-	    xpad->xtype == XTYPE_XBOX360W) {
-		for (i = 0; xpad_abs_pad[i] >= 0; i++)
-			xpad_set_up_abs(input_dev, xpad_abs_pad[i]);
-	}
-
+	/* set up triggers */
 	if (xpad->mapping & MAP_TRIGGERS_TO_BUTTONS) {
 		for (i = 0; xpad_btn_triggers[i] >= 0; i++)
 			input_set_capability(input_dev, EV_KEY,
@@ -1528,15 +1406,11 @@ static int xpad_resume(struct usb_interface *intf)
 	struct input_dev *input = xpad->dev;
 	int retval = 0;
 
-	if (xpad->xtype == XTYPE_XBOX360W) {
-		retval = xpad360w_start_input(xpad);
-	} else {
-		mutex_lock(&input->mutex);
-		if (input->users) {
-			retval = xpad_start_input(xpad);
-		} 
-		mutex_unlock(&input->mutex);
-	}
+	mutex_lock(&input->mutex);
+	if (input->users) {
+		retval = xpad_start_input(xpad);
+	} 
+	mutex_unlock(&input->mutex);
 
 	return retval;
 }

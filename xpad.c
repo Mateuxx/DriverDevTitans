@@ -76,7 +76,7 @@
 /* The Guitar Hero Live (GHL) Xbox One dongles require a poke 
  * every 8 seconds.
  */
-#define GHL_GUITAR_POKE_INTERVAL 8 /* In seconds */
+//#define GHL_GUITAR_POKE_INTERVAL 8 /* In seconds */
 
 /*
  * xbox d-pads should map to buttons, as is required for DDR pads
@@ -99,7 +99,7 @@
 /* Send power-off packet to xpad360w after holding the mode button for this many
  * seconds
  */
-#define XPAD360W_POWEROFF_TIMEOUT 5
+//#define XPAD360W_POWEROFF_TIMEOUT 5
 
 #define PKT_XB              0
 #define PKT_XBE1            1
@@ -191,19 +191,6 @@ static const signed short xpad_abs_triggers[] = {
 	-1
 };
 
-/* used when the controller has extra paddle buttons */
-static const signed short xpad_btn_paddles[] = {
-	BTN_TRIGGER_HAPPY5, BTN_TRIGGER_HAPPY6, /* paddle upper right, lower right */
-	BTN_TRIGGER_HAPPY7, BTN_TRIGGER_HAPPY8, /* paddle upper left, lower left */
-	-1						/* terminating entry */
-};
-
-/* used for GHL dpad mapping */
-static const struct {int x; int y; } dpad_mapping[] = {
-	{0, -1}, {1, -1}, {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1},
-	{0, 0}
-};
-
 /*
  * Xbox 360 has a vendor-specific class, so we cannot match it with only
  * USB_INTERFACE_INFO (also specifically refused by USB subsystem), so we
@@ -221,18 +208,6 @@ static const struct {int x; int y; } dpad_mapping[] = {
 	{ XPAD_XBOX360_VENDOR_PROTOCOL((vend), 129) }
 
 
-//----------------X BOX ONE STUFF HERE - NOT USED-----------------------------
-
-/* The Xbox One controller uses subclass 71 and protocol 208. */
-// #define XPAD_XBOXONE_VENDOR_PROTOCOL(vend, pr) \
-// 	.match_flags = USB_DEVICE_ID_MATCH_VENDOR | USB_DEVICE_ID_MATCH_INT_INFO, \
-// 	.idVendor = (vend), \
-// 	.bInterfaceClass = USB_CLASS_VENDOR_SPEC, \
-// 	.bInterfaceSubClass = 71, \
-// 	.bInterfaceProtocol = (pr)
-// #define XPAD_XBOXONE_VENDOR(vend) \
-// 	{ XPAD_XBOXONE_VENDOR_PROTOCOL((vend), 208) }
-
 static const struct usb_device_id xpad_table[] = {
 	{ USB_INTERFACE_INFO('X', 'B', 0) },	/* X-Box USB-IF not approved class */
 	XPAD_XBOX360_VENDOR(0x045e),		/* Microsoft X-Box 360 controllers */
@@ -241,23 +216,6 @@ static const struct usb_device_id xpad_table[] = {
 
 MODULE_DEVICE_TABLE(usb, xpad_table);
 
-
-//----------------X BOX ONE STUFF HERE - NOT USED-----------------------------
-
-// struct xboxone_init_packet {
-// 	u16 idVendor;
-// 	u16 idProduct;
-// 	const u8 *data;
-// 	u8 len;
-// };
-
-// #define XBOXONE_INIT_PKT(_vid, _pid, _data)		\
-// 	{						\
-// 		.idVendor	= (_vid),		\
-// 		.idProduct	= (_pid),		\
-// 		.data		= (_data),		\
-// 		.len		= ARRAY_SIZE(_data),	\
-// 	}
 
 /*
  * starting with xbox one, the game input protocol is used
@@ -300,68 +258,14 @@ MODULE_DEVICE_TABLE(usb, xpad_table);
 #define GIP_MOTOR_ALL (GIP_MOTOR_R | GIP_MOTOR_L | GIP_MOTOR_RT | GIP_MOTOR_LT)
 
 /*
- * This packet is required for all Xbox One pads with 2015
- * or later firmware installed (or present from the factory).
- */
-static const u8 xboxone_power_on[] = {
-	GIP_CMD_POWER, GIP_OPT_INTERNAL, GIP_SEQ0, GIP_PL_LEN(1), GIP_PWR_ON
-};
-
-/*
- * This packet is required for Xbox One S (0x045e:0x02ea)
- * and Xbox One Elite Series 2 (0x045e:0x0b00) pads to
- * initialize the controller that was previously used in
- * Bluetooth mode.
- */
-static const u8 xboxone_s_init[] = {
-	GIP_CMD_POWER, GIP_OPT_INTERNAL, GIP_SEQ0, 0x0f, 0x06
-};
-
-/*
  * This packet is required to get additional input data
  * from Xbox One Elite Series 2 (0x045e:0x0b00) pads.
  * We mostly do this right now to get paddle data
- */
+ 
 static const u8 extra_input_packet_init[] = {
 	0x4d, 0x10, 0x01, 0x02, 0x07, 0x00
 };
-
-/*
- * This packet is required for the Titanfall 2 Xbox One pads
- * (0x0e6f:0x0165) to finish initialization and for Hori pads
- * (0x0f0d:0x0067) to make the analog sticks work.
- */
-static const u8 xboxone_hori_ack_id[] = {
-	GIP_CMD_ACK, GIP_OPT_INTERNAL, GIP_SEQ0, GIP_PL_LEN(9),
-	0x00, GIP_CMD_IDENTIFY, GIP_OPT_INTERNAL, 0x3a, 0x00, 0x00, 0x00, 0x80, 0x00
-};
-
-/*
- * This packet is required for most (all?) of the PDP pads to start
- * sending input reports. These pads include: (0x0e6f:0x02ab),
- * (0x0e6f:0x02a4), (0x0e6f:0x02a6).
- */
-static const u8 xboxone_pdp_led_on[] = {
-	GIP_CMD_LED, GIP_OPT_INTERNAL, GIP_SEQ0, GIP_PL_LEN(3), 0x00, GIP_LED_ON, 0x14
-};
-
-/*
- * This packet is required for most (all?) of the PDP pads to start
- * sending input reports. These pads include: (0x0e6f:0x02ab),
- * (0x0e6f:0x02a4), (0x0e6f:0x02a6).
- */
-static const u8 xboxone_pdp_auth[] = {
-	GIP_CMD_AUTHENTICATE, GIP_OPT_INTERNAL, GIP_SEQ0, GIP_PL_LEN(2), 0x01, 0x00
-};
-
-/*
- * A specific rumble packet is required for some PowerA pads to start
- * sending input reports. One of those pads is (0x24c6:0x543a).
- */
-static const u8 xboxone_rumblebegin_init[] = {
-	GIP_CMD_RUMBLE, 0x00, GIP_SEQ0, GIP_PL_LEN(9),
-	0x00, GIP_MOTOR_ALL, 0x00, 0x00, 0x1D, 0x1D, 0xFF, 0x00, 0x00
-};
+*/
 
 struct xpad_output_packet {
 	u8 data[XPAD_PKT_LEN];
@@ -640,10 +544,6 @@ static bool xpad_prepare_next_out_packet(struct usb_xpad *xpad)
 {
 	struct xpad_output_packet *pkt, *packet = NULL;
 	int i;
-
-	/* We may have init packets to send before we can send user commands */
-	// if (xpad_prepare_next_init_packet(xpad))
-	// 	return true;
 
 	for (i = 0; i < XPAD_NUM_OUT_PACKETS; i++) {
 		if (++xpad->last_out_packet >= XPAD_NUM_OUT_PACKETS)
@@ -1195,12 +1095,6 @@ static int xpad_init_input(struct usb_xpad *xpad)
 					     xpad_btn_pad[i]);
 	}
 
-	/* set up paddles if the controller has them */
-	if (xpad->mapping & MAP_PADDLES) {
-		for (i = 0; xpad_btn_paddles[i] >= 0; i++)
-			input_set_capability(input_dev, EV_KEY, xpad_btn_paddles[i]);
-	}
-
 	/* set up triggers */
 	if (xpad->mapping & MAP_TRIGGERS_TO_BUTTONS) {
 		for (i = 0; xpad_btn_triggers[i] >= 0; i++)
@@ -1289,10 +1183,7 @@ static int xpad_probe(struct usb_interface *intf, const struct usb_device_id *id
 	//
 	if (xpad->xtype == XTYPE_UNKNOWN) {
 		if (intf->cur_altsetting->desc.bInterfaceClass == USB_CLASS_VENDOR_SPEC) {
-			if (intf->cur_altsetting->desc.bInterfaceProtocol == 129)
-				xpad->xtype = XTYPE_XBOX360W;
-			else
-				xpad->xtype = XTYPE_XBOX360;
+			xpad->xtype = XTYPE_XBOX360;
 		} else {
 			xpad->xtype = XTYPE_XBOX;
 		}
@@ -1361,21 +1252,12 @@ static void xpad_disconnect(struct usb_interface *intf)
 	struct usb_xpad *xpad = usb_get_intfdata(intf);
 
 	xpad_deinit_input(xpad);
-
-	/*
-	 * Now that both input device and LED device are gone we can
-	 * stop output URB.
-	 */
+	 
 	xpad_stop_output(xpad);
 
 	xpad_deinit_output(xpad);
 
 	usb_free_urb(xpad->irq_in);
-
-	if (xpad->quirks & QUIRK_GHL_XBOXONE) {
-		usb_free_urb(xpad->ghl_urb);
-		del_timer_sync(&xpad->ghl_poke_timer);
-	}
 
 	usb_free_coherent(xpad->udev, XPAD_PKT_LEN,
 			xpad->idata, xpad->idata_dma);

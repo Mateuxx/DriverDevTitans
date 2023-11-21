@@ -220,15 +220,18 @@ static const struct {int x; int y; } dpad_mapping[] = {
 	{ XPAD_XBOX360_VENDOR_PROTOCOL((vend), 1) }, \
 	{ XPAD_XBOX360_VENDOR_PROTOCOL((vend), 129) }
 
+
+//----------------X BOX ONE STUFF HERE - NOT USED-----------------------------
+
 /* The Xbox One controller uses subclass 71 and protocol 208. */
-#define XPAD_XBOXONE_VENDOR_PROTOCOL(vend, pr) \
-	.match_flags = USB_DEVICE_ID_MATCH_VENDOR | USB_DEVICE_ID_MATCH_INT_INFO, \
-	.idVendor = (vend), \
-	.bInterfaceClass = USB_CLASS_VENDOR_SPEC, \
-	.bInterfaceSubClass = 71, \
-	.bInterfaceProtocol = (pr)
-#define XPAD_XBOXONE_VENDOR(vend) \
-	{ XPAD_XBOXONE_VENDOR_PROTOCOL((vend), 208) }
+// #define XPAD_XBOXONE_VENDOR_PROTOCOL(vend, pr) \
+// 	.match_flags = USB_DEVICE_ID_MATCH_VENDOR | USB_DEVICE_ID_MATCH_INT_INFO, \
+// 	.idVendor = (vend), \
+// 	.bInterfaceClass = USB_CLASS_VENDOR_SPEC, \
+// 	.bInterfaceSubClass = 71, \
+// 	.bInterfaceProtocol = (pr)
+// #define XPAD_XBOXONE_VENDOR(vend) \
+// 	{ XPAD_XBOXONE_VENDOR_PROTOCOL((vend), 208) }
 
 static const struct usb_device_id xpad_table[] = {
 	{ USB_INTERFACE_INFO('X', 'B', 0) },	/* X-Box USB-IF not approved class */
@@ -238,20 +241,23 @@ static const struct usb_device_id xpad_table[] = {
 
 MODULE_DEVICE_TABLE(usb, xpad_table);
 
-struct xboxone_init_packet {
-	u16 idVendor;
-	u16 idProduct;
-	const u8 *data;
-	u8 len;
-};
 
-#define XBOXONE_INIT_PKT(_vid, _pid, _data)		\
-	{						\
-		.idVendor	= (_vid),		\
-		.idProduct	= (_pid),		\
-		.data		= (_data),		\
-		.len		= ARRAY_SIZE(_data),	\
-	}
+//----------------X BOX ONE STUFF HERE - NOT USED-----------------------------
+
+// struct xboxone_init_packet {
+// 	u16 idVendor;
+// 	u16 idProduct;
+// 	const u8 *data;
+// 	u8 len;
+// };
+
+// #define XBOXONE_INIT_PKT(_vid, _pid, _data)		\
+// 	{						\
+// 		.idVendor	= (_vid),		\
+// 		.idProduct	= (_pid),		\
+// 		.data		= (_data),		\
+// 		.len		= ARRAY_SIZE(_data),	\
+// 	}
 
 /*
  * starting with xbox one, the game input protocol is used
@@ -379,25 +385,27 @@ static const char ghl_xboxone_magic_data[] = {
  * sent. The correct sequence number will be added when the
  * packet is going to be sent.
  */
-static const struct xboxone_init_packet xboxone_init_packets[] = {
-	XBOXONE_INIT_PKT(0x0e6f, 0x0165, xboxone_hori_ack_id),
-	XBOXONE_INIT_PKT(0x0f0d, 0x0067, xboxone_hori_ack_id),
-	XBOXONE_INIT_PKT(0x1430, 0x079b, xboxone_hori_ack_id),
-	XBOXONE_INIT_PKT(0x0000, 0x0000, xboxone_power_on),
-	XBOXONE_INIT_PKT(0x045e, 0x02ea, xboxone_s_init),
-	XBOXONE_INIT_PKT(0x045e, 0x0b00, xboxone_s_init),
-	XBOXONE_INIT_PKT(0x045e, 0x0b00, extra_input_packet_init),
-	XBOXONE_INIT_PKT(0x0e6f, 0x0000, xboxone_pdp_led_on),
-	XBOXONE_INIT_PKT(0x1430, 0x079b, xboxone_pdp_led_on),
-	XBOXONE_INIT_PKT(0x0e6f, 0x0000, xboxone_pdp_auth),
-	XBOXONE_INIT_PKT(0x1430, 0x079b, xboxone_pdp_auth),
-	XBOXONE_INIT_PKT(0x24c6, 0x541a, xboxone_rumblebegin_init),
-	XBOXONE_INIT_PKT(0x24c6, 0x542a, xboxone_rumblebegin_init),
-	XBOXONE_INIT_PKT(0x24c6, 0x543a, xboxone_rumblebegin_init),
-	XBOXONE_INIT_PKT(0x24c6, 0x541a, xboxone_rumbleend_init),
-	XBOXONE_INIT_PKT(0x24c6, 0x542a, xboxone_rumbleend_init),
-	XBOXONE_INIT_PKT(0x24c6, 0x543a, xboxone_rumbleend_init),
-};
+// xboxone_init_packets is not used
+
+// static const struct xboxone_init_packet xboxone_init_packets[] = {
+// 	XBOXONE_INIT_PKT(0x0e6f, 0x0165, xboxone_hori_ack_id),
+// 	XBOXONE_INIT_PKT(0x0f0d, 0x0067, xboxone_hori_ack_id),
+// 	XBOXONE_INIT_PKT(0x1430, 0x079b, xboxone_hori_ack_id),
+// 	XBOXONE_INIT_PKT(0x0000, 0x0000, xboxone_power_on),
+// 	XBOXONE_INIT_PKT(0x045e, 0x02ea, xboxone_s_init),
+// 	XBOXONE_INIT_PKT(0x045e, 0x0b00, xboxone_s_init),
+// 	XBOXONE_INIT_PKT(0x045e, 0x0b00, extra_input_packet_init),
+// 	XBOXONE_INIT_PKT(0x0e6f, 0x0000, xboxone_pdp_led_on),
+// 	XBOXONE_INIT_PKT(0x1430, 0x079b, xboxone_pdp_led_on),
+// 	XBOXONE_INIT_PKT(0x0e6f, 0x0000, xboxone_pdp_auth),
+// 	XBOXONE_INIT_PKT(0x1430, 0x079b, xboxone_pdp_auth),
+// 	XBOXONE_INIT_PKT(0x24c6, 0x541a, xboxone_rumblebegin_init),
+// 	XBOXONE_INIT_PKT(0x24c6, 0x542a, xboxone_rumblebegin_init),
+// 	XBOXONE_INIT_PKT(0x24c6, 0x543a, xboxone_rumblebegin_init),
+// 	XBOXONE_INIT_PKT(0x24c6, 0x541a, xboxone_rumbleend_init),
+// 	XBOXONE_INIT_PKT(0x24c6, 0x542a, xboxone_rumbleend_init),
+// 	XBOXONE_INIT_PKT(0x24c6, 0x543a, xboxone_rumbleend_init),
+// };
 
 struct xpad_output_packet {
 	u8 data[XPAD_PKT_LEN];
@@ -466,57 +474,63 @@ static void xpad360w_poweroff_controller(struct usb_xpad *xpad);
  *
  *	Call back function that resets the timer for the next magic data poke.
  */
-static void ghl_magic_poke_cb(struct urb *urb)
-{
-	struct usb_xpad *xpad = urb->context;
 
-	if (urb->status < 0)
-		pr_warn("URB transfer failed.\n");
+// --- Not used --- guitar hero live stuff----------------
 
-	mod_timer(&xpad->ghl_poke_timer, jiffies + GHL_GUITAR_POKE_INTERVAL*HZ);
-}
+// static void ghl_magic_poke_cb(struct urb *urb)
+// {
+// 	struct usb_xpad *xpad = urb->context;
+
+// 	if (urb->status < 0)
+// 		pr_warn("URB transfer failed.\n");
+
+// 	mod_timer(&xpad->ghl_poke_timer, jiffies + GHL_GUITAR_POKE_INTERVAL*HZ);
+// }
 
 /*
  *	ghl_magic_poke
  *
  *	Submits the GHL magic_data URB.
  */
-static void ghl_magic_poke(struct timer_list *t)
-{
-	int ret;
-	struct usb_xpad *xpad = from_timer(xpad, t, ghl_poke_timer);
+// not used as we don't support GHL
 
-	ret = usb_submit_urb(xpad->ghl_urb, GFP_ATOMIC);
-	if (ret < 0)
-		pr_warn("URB transfer failed.\n");
-}
+
+// static void ghl_magic_poke(struct timer_list *t)
+// {
+// 	int ret;
+// 	struct usb_xpad *xpad = from_timer(xpad, t, ghl_poke_timer);
+
+// 	ret = usb_submit_urb(xpad->ghl_urb, GFP_ATOMIC);
+// 	if (ret < 0)
+// 		pr_warn("URB transfer failed.\n");
+// }
 
 /*
  *	ghl_init_urb
  *
  *	Prepares the interrupt URB for GHL magic_data.
  */
-static int ghl_init_urb(struct usb_xpad *xpad, struct usb_device *usbdev,
-		const char ghl_magic_data[], u16 poke_size, struct usb_endpoint_descriptor *ep_irq_out)
-{
-	u8 *databuf;
-	unsigned int pipe;
+// static int ghl_init_urb(struct usb_xpad *xpad, struct usb_device *usbdev,
+// 		const char ghl_magic_data[], u16 poke_size, struct usb_endpoint_descriptor *ep_irq_out)
+// {
+// 	u8 *databuf;
+// 	unsigned int pipe;
 
-	pipe = usb_sndintpipe(usbdev, ep_irq_out->bEndpointAddress);
+// 	pipe = usb_sndintpipe(usbdev, ep_irq_out->bEndpointAddress);
 
-	databuf = devm_kzalloc(&xpad->udev->dev, poke_size, GFP_ATOMIC);
-	if (databuf == NULL)
-		return -ENOMEM;
+// 	databuf = devm_kzalloc(&xpad->udev->dev, poke_size, GFP_ATOMIC);
+// 	if (databuf == NULL)
+// 		return -ENOMEM;
 
-	memcpy(databuf, ghl_magic_data, poke_size);
+// 	memcpy(databuf, ghl_magic_data, poke_size);
 
-	usb_fill_int_urb(
-		xpad->ghl_urb, usbdev, pipe,
-		databuf, poke_size,
-		ghl_magic_poke_cb, xpad, ep_irq_out->bInterval);
+// 	usb_fill_int_urb(
+// 		xpad->ghl_urb, usbdev, pipe,
+// 		databuf, poke_size,
+// 		ghl_magic_poke_cb, xpad, ep_irq_out->bInterval);
 
-	return 0;
-}
+// 	return 0;
+// }
 
 /*
  *	xpad_process_packet
@@ -1018,37 +1032,38 @@ exit:
 			__func__, retval);
 }
 
-/* Callers must hold xpad->odata_lock spinlock */
-static bool xpad_prepare_next_init_packet(struct usb_xpad *xpad)
-{
-	const struct xboxone_init_packet *init_packet;
+// Chama apenas para o Xbox One -> eu acho ?? 
+// /* Callers must hold xpad->odata_lock spinlock */
+// static bool xpad_prepare_next_init_packet(struct usb_xpad *xpad)
+// {
+// 	const struct xboxone_init_packet *init_packet;
 
-	if (xpad->xtype != XTYPE_XBOXONE)
-		return false;
+// 	if (xpad->xtype != XTYPE_XBOXONE)
+// 		return false;
 
-	/* Perform initialization sequence for Xbox One pads that require it */
-	while (xpad->init_seq < ARRAY_SIZE(xboxone_init_packets)) {
-		init_packet = &xboxone_init_packets[xpad->init_seq++];
+// 	/* Perform initialization sequence for Xbox One pads that require it */
+// 	while (xpad->init_seq < ARRAY_SIZE(xboxone_init_packets)) {
+// 		init_packet = &xboxone_init_packets[xpad->init_seq++];
 
-		if (init_packet->idVendor != 0 &&
-		    init_packet->idVendor != xpad->dev->id.vendor)
-			continue;
+// 		if (init_packet->idVendor != 0 &&
+// 		    init_packet->idVendor != xpad->dev->id.vendor)
+// 			continue;
 
-		if (init_packet->idProduct != 0 &&
-		    init_packet->idProduct != xpad->dev->id.product)
-			continue;
+// 		if (init_packet->idProduct != 0 &&
+// 		    init_packet->idProduct != xpad->dev->id.product)
+// 			continue;
 
-		/* This packet applies to our device, so prepare to send it */
-		memcpy(xpad->odata, init_packet->data, init_packet->len);
-		xpad->irq_out->transfer_buffer_length = init_packet->len;
+// 		/* This packet applies to our device, so prepare to send it */
+// 		memcpy(xpad->odata, init_packet->data, init_packet->len);
+// 		xpad->irq_out->transfer_buffer_length = init_packet->len;
 
-		/* Update packet with current sequence number */
-		xpad->odata[2] = xpad->odata_serial++;
-		return true;
-	}
+// 		/* Update packet with current sequence number */
+// 		xpad->odata[2] = xpad->odata_serial++;
+// 		return true;
+// 	}
 
-	return false;
-}
+// 	return false;
+// }
 
 /* Callers must hold xpad->odata_lock spinlock */
 static bool xpad_prepare_next_out_packet(struct usb_xpad *xpad)
@@ -1057,8 +1072,8 @@ static bool xpad_prepare_next_out_packet(struct usb_xpad *xpad)
 	int i;
 
 	/* We may have init packets to send before we can send user commands */
-	if (xpad_prepare_next_init_packet(xpad))
-		return true;
+	// if (xpad_prepare_next_init_packet(xpad))
+	// 	return true;
 
 	for (i = 0; i < XPAD_NUM_OUT_PACKETS; i++) {
 		if (++xpad->last_out_packet >= XPAD_NUM_OUT_PACKETS)
@@ -1964,20 +1979,20 @@ static int xpad_probe(struct usb_interface *intf, const struct usb_device_id *id
 	}
 	
    // pequisar o que é quirk usb
-	if (xpad->quirks & QUIRK_GHL_XBOXONE) {
+	// if (xpad->quirks & QUIRK_GHL_XBOXONE) {
 
-		xpad->ghl_urb = usb_alloc_urb(0, GFP_ATOMIC);
-		if (!xpad->ghl_urb)
-			return -ENOMEM;
+	// 	xpad->ghl_urb = usb_alloc_urb(0, GFP_ATOMIC);
+	// 	if (!xpad->ghl_urb)
+	// 		return -ENOMEM;
 
-		error = ghl_init_urb(xpad, udev, ghl_xboxone_magic_data, ARRAY_SIZE(ghl_xboxone_magic_data), ep_irq_out);
+	// 	// error = ghl_init_urb(xpad, udev, ghl_xboxone_magic_data, ARRAY_SIZE(ghl_xboxone_magic_data), ep_irq_out);
 
-		if (error)
-			return error;
+	// 	if (error)
+	// 		return error;
 
-		timer_setup(&xpad->ghl_poke_timer, ghl_magic_poke, 0);
-		mod_timer(&xpad->ghl_poke_timer, jiffies + GHL_GUITAR_POKE_INTERVAL*HZ);
-	}
+	// 	// timer_setup(&xpad->ghl_poke_timer, ghl_magic_poke, 0);
+	// 	// mod_timer(&xpad->ghl_poke_timer, jiffies + GHL_GUITAR_POKE_INTERVAL*HZ);
+	// }
 	return 0;
 
 err_deinit_output:
